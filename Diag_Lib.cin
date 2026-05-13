@@ -59,3 +59,23 @@ void UDS_Response(diagRequest * diagReq, byte data_buffer[])
     data_buffer[i] = DiagGetPrimitiveByte(diagReq, i);
   }
 }
+
+// Function can be used when service is requested via diag object is defined in the variables
+void DiagRequest_via_object(diagRequest * diagReq)
+{
+  if(1 == UDS_Request(diagReq))
+  {
+    testStepPass("Response Received", "Positive Response Received.");
+  }
+}
+
+// Function can be used when service is requested via bytes
+void DiagRequest_via_bytes(diagRequest * diagReq, byte request_arr[])
+{
+  diagResize(diagReq, elcount(request_arr));
+  diagSetPrimitiveData(diagReq, request_arr, elcount(request_arr));
+  if(1 == UDS_Request(diagReq))
+  {
+    testStepPass("Response Received", "Positive Response Received");
+  }
+}
