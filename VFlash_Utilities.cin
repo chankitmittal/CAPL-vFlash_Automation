@@ -309,7 +309,7 @@ enum vFlashStatusCode TestWaitForvFlashPackReprogrammed(char flashpack[])
   }
   else
   {
-    TestStepPass("TestWaitForvFlashInitialized", "vFlash initialized successfully");
+    TestStep("TestWaitForvFlashInitialized", "vFlash initialized successfully");
   }
   
   //----- Load Project ----
@@ -323,7 +323,7 @@ enum vFlashStatusCode TestWaitForvFlashPackReprogrammed(char flashpack[])
   }
   else
   {
-    TestStepPass("TestWaitForvFlashProjectLoaded", "Successfully loaded project: %s", _gFlashpack);
+    TestStep("TestWaitForvFlashProjectLoaded", "Successfully loaded project: %s", _gFlashpack);
   }
   
   //----- Activate Network
@@ -338,7 +338,7 @@ enum vFlashStatusCode TestWaitForvFlashPackReprogrammed(char flashpack[])
     }
     else
     {
-      TestStepPass("TestWaitForvFlashNetworkActivated", "Network activated successfully");
+      TestStep("TestWaitForvFlashNetworkActivated", "Network activated successfully");
     }
   }
   
@@ -354,7 +354,7 @@ enum vFlashStatusCode TestWaitForvFlashPackReprogrammed(char flashpack[])
     }
     else
     {
-      TestStepPass("TestWaitForvFlashReprogrammed", "ECU reprogrammed successful");
+      TestStep("TestWaitForvFlashReprogrammed", "ECU reprogrammed successful");
     }
   }
 
@@ -370,7 +370,7 @@ enum vFlashStatusCode TestWaitForvFlashPackReprogrammed(char flashpack[])
     }
     else
     {
-      TestStepPass("TestWaitForvFlashProjectUnloaded", "Project unloaded successfully");
+      TestStep("TestWaitForvFlashProjectUnloaded", "Project unloaded successfully");
     }   
   }
   
@@ -384,7 +384,7 @@ enum vFlashStatusCode TestWaitForvFlashPackReprogrammed(char flashpack[])
   }
   else
   {
-    TestStepPass("TestWaitForvFlashDeinitialized", "vFlash deinitialized successfully");
+    TestStep("TestWaitForvFlashDeinitialized", "vFlash deinitialized successfully");
   }
   return resultCode; // last result is of TestWaitForvFlashReprogrammed; result of Unload/Deinitialize ignored
 #else
@@ -420,7 +420,7 @@ enum vFlashStatusCode TestWaitForCorruptedvFlashPackReprogrammed(char flashpack[
   }
   else
   {
-    TestStepPass("TestWaitForvFlashInitialized", "vFlash initialized successfully");
+    TestStep("TestWaitForvFlashInitialized", "vFlash initialized successfully");
   }
   
   //----- Load Project ----
@@ -434,7 +434,7 @@ enum vFlashStatusCode TestWaitForCorruptedvFlashPackReprogrammed(char flashpack[
   }
   else
   {
-    TestStepPass("TestWaitForvFlashProjectLoaded", "Successfully loaded project: %s", _gFlashpack);
+    TestStep("TestWaitForvFlashProjectLoaded", "Successfully loaded project: %s", _gFlashpack);
   }
   
   //----- Activate Network
@@ -449,7 +449,7 @@ enum vFlashStatusCode TestWaitForCorruptedvFlashPackReprogrammed(char flashpack[
     }
     else
     {
-      TestStepPass("TestWaitForvFlashNetworkActivated", "Network activated successfully");
+      TestStep("TestWaitForvFlashNetworkActivated", "Network activated successfully");
     }
   }
   
@@ -488,7 +488,7 @@ enum vFlashStatusCode TestWaitForCorruptedvFlashPackReprogrammed(char flashpack[
     }
     else
     {
-      TestStepPass("TestWaitForvFlashProjectUnloaded", "Project unloaded successfully");
+      TestStep("TestWaitForvFlashProjectUnloaded", "Project unloaded successfully");
     }   
   }
   
@@ -502,7 +502,7 @@ enum vFlashStatusCode TestWaitForCorruptedvFlashPackReprogrammed(char flashpack[
   }
   else
   {
-    TestStepPass("TestWaitForvFlashDeinitialized", "vFlash deinitialized successfully");
+    TestStep("TestWaitForvFlashDeinitialized", "vFlash deinitialized successfully");
   }
   return resultCode; // last result is of TestWaitForvFlashReprogrammed; result of Unload/Deinitialize ignored
 #else
