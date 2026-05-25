@@ -1,512 +1,215 @@
 /*@!Encoding:1252*/
 variables
 {
-  msTimer tDelayedTextEvent;
   enum vFlashStatusCode
   {
-    InternalError                     = -10, // Internal error in FlashNodeLayer Dll
-    CallbackInSimlationMissing        =  -3, // If asynchronous functions are used (e.g. required in simulations), a corresponding callback has to be defined
-    TestFunctionInSimulationCalled    =  -2, // Test functions are only allowed in test modules.
-    Busy                              =  -1, // Another API function has been called already and is still running.
-    Timeout                           =   0, // Wait state is exited due to a timeout (Reserved for later usage)
+    InternalError                     = -10, 
+    CallbackInSimlationMissing        =  -3, 
+    TestFunctionInSimulationCalled    =  -2, 
+    Busy                              =  -1, 
+    Timeout                           =   0, 
+    Success                           =   1,      
     
-    
-    //////////////////////////////////////////////////////////////////////////////////// 
-    // The following values represent the enums VFlashStatus and VFlashResults defined in "VFlashAutomationTypes.h".
-    // --- Errors - call 'vFlashGetLastErrorMessage(...)' for details ---
-    //////////////////////////////////////////////////////////////////////////////////// 
-     
-    Success = 1,      // Success. Represents FlashResult.FR_Success or FlashStatus.FS_Success 
-                      // In case of a TestWaitFor...() functions, additionally the wait state is exited.
-                          
-
-    
-    ////////////////////////////////////////////////////////////////////////////////////      
-    // value of [enum FlashResult] + 1000
-    ////////////////////////////////////////////////////////////////////////////////////
-    FR_InitializationError        = 1010, // Project could not be initialized (e.g. vFlash is not installed on the machine)
-    FR_DeinitializationError      = 1011, // deprecated / not in use 
-    FR_InvalidProjectHandle       = 1012, // Project handle is not valid
-    FR_InvalidLicense             = 1013, // License check failed. (e.g. vFlash license is not valid)
-
-    FR_StopFailed                 = 1020, // Stop failed
-    FR_ProjectInProcessing        = 1021, // deprecated / not in use 
-    
-    FR_NoProjectLoaded            = 1030, // Project is not loaded. 
-    FR_ProjectPathInvalid         = 1031, // Path to the project file is invalid (e.g. the project file does not exist ) 
-    FR_InconsistentProject        = 1032, // The project could not be loaded (e.g. referenced file missing, invalid project content, invalid project path) 
-    FR_InvalidCallbacks           = 1033, // Not in use 
-    FR_ProcessingFlashwareError   = 1034, // Flashware (e.g. Intel-Hex, Motorola-S files, ODX files) cannot be processed 
-    FR_ChannelAlreadyInUse        = 1035, // Hardware channel already in use (e.g. incorrect hardware configuration setup)       
-    FR_NetworkActivationFailed    = 1036, // Activate Network failed (e.g. incorrect hardware configuration setup) 
-    FR_ChannelInvalid             = 1037, // Hardware channel is not assigned (e.g. incorrect hardware configuration setup)
-
-    FR_NoCanDriverAvailable	      = 1040, // CAN Driver could not be found (e.g. check whether vector driver is installed) 
-    FR_SoftwareIntegrityCheckFailed   = 1045, // Software integrity check failed (e.g. invalid checksum)
-
-    FR_InvalidCommandOrder        = 1050, // Command order is incorrect (e.g. initialization is required before loading a project) 
-    FR_FileNotFound               = 1051, // The project file or files referenced in a project could not be loaded (e.g. referenced file missing, invalid project content, invalid project path) 
-    FR_ProjectLoadFailed          = 1052, // The project could not be loaded (e.g. referenced file missing, invalid project content) 
-    FR_ProjectUnloadFailed        = 1053, // The project could not be unloaded 
-    FR_MaxProjectNumberExceeded   = 1054, // Limit of project number exceeded (e.g. more than 8 projects can not be loaded) 
-
-    FR_AttributeNotFound          = 1055, // Flash attribute could not be found (e.g. incorrect attribute name) 
-    FR_AttributeConversionFailed  = 1056, // Flash attribute could not be converted (e.g. string can not be converted into an integer) 
-
+    // --- FlashResult Errors ---
+    FR_InitializationError        = 1010, 
+    FR_DeinitializationError      = 1011, 
+    FR_InvalidProjectHandle       = 1012, 
+    FR_InvalidLicense             = 1013, 
+    FR_StopFailed                 = 1020, 
+    FR_ProjectInProcessing        = 1021, 
+    FR_NoProjectLoaded            = 1030, 
+    FR_ProjectPathInvalid         = 1031, 
+    FR_InconsistentProject        = 1032, 
+    FR_InvalidCallbacks           = 1033, 
+    FR_ProcessingFlashwareError   = 1034, 
+    FR_ChannelAlreadyInUse        = 1035,        
+    FR_NetworkActivationFailed    = 1036,  
+    FR_ChannelInvalid             = 1037, 
+    FR_NoCanDriverAvailable       = 1040, 
+    FR_SoftwareIntegrityCheckFailed = 1045, 
+    FR_InvalidCommandOrder        = 1050,  
+    FR_FileNotFound               = 1051, 
+    FR_ProjectLoadFailed          = 1052, 
+    FR_ProjectUnloadFailed        = 1053, 
+    FR_MaxProjectNumberExceeded   = 1054, 
+    FR_AttributeNotFound          = 1055, 
+    FR_AttributeConversionFailed  = 1056, 
     FR_UnknownError               = 1100,
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    // value of [enum FlashStatus] + 2000
-    ////////////////////////////////////////////////////////////////////////////////////
-    FS_LicenseIsNotAvailable                      = 2009, // vFlash License is not available 
-    
-    FS_Aborted                                    = 2010, // The launched action was aborted (e.g. flash process was aborted by the user) 
-    FS_UnknownError                               = 2011, // Unknown error occurred 
-    FS_ProcessingFlashwareFailed                  = 2015, // Processing Flashware failed (e.g. due invalid format of Intel-Hex, Motorola-S files, ODX files) 
-    FS_InitializingCommunicationFailed            = 2016, // Initializing communication failed (e.g. due to incorrect channel assignment, incorrect hardware setup) 
-    FS_StopReprogrammingFailed                    = 2017, // Reprogramming could not be aborted successfully 
-    FS_ProjectDataInvalid                         = 2018, // Invalid project data detected (e.g. invalid communication parameters, missing Flashware, missing SeedKey.dll) 
-    FS_InitializingFlashLibraryFailed             = 2019, // Not in use 
-    FS_ScriptVersionMismatch                      = 2020, // The version of vFlash has to be at least as current as the version of the vFlash Template 
-    FS_LoadingProjectFailed                       = 2021, // The project could not be loaded (e.g. referenced file missing, invalid project content) 
-    FS_FlashwareChanged                           = 2022, // The flashware changed (e.g. the referenced flashware changed during reprogramming) 
-    FS_ReadingExpectedIdentsFailed                = 2023, // The ODX-F ExpectedIdent data could not be read (e.g. since required ODX-D is missing) 
-    FS_ForceBootModeFailed                        = 2024, // Force Boot Mode could not be executed   
-    FS_SwitchBaudrateFailed                       = 2025, // Baudrate switch failed (e.g. since other application has “Init Rights” on hardware channel) 
-    FS_SendWakeUpPatternFailed                    = 2026, // Wakeup pattern could not be send (e.g. transmitting wakeup pattern failed) 
-
-    FS_GeneralScriptFailure                       = 2040, // Executing reprogramming failed (e.g. transferring data failed) 
-    FS_SeedKeyHandlingFailed                      = 2041, // SeedKey.dll could not be loaded (e.g. invalid or missing SeedKey.dll) 
-    FS_SecurityAccessFailed                       = 2042, // Security Access failed (e.g. unlocking ECU failed)  
-    FS_CommunicationFailed                        = 2043, // Starting communication failed (e.g. incomplete hardware configuration setup)  
-    FS_DiagnosticTransactionFailed                = 2044, // Processing Diagnostic transaction failed (e.g. transmitting diagnostic message failed, response missing) 
-    FS_SoftwareIntegrityCheckFailed               = 2045, // Software integrity check failed (e.g. invalid checksum) 
-    FS_NegativeResponseReceived                   = 2046, // ECU send a negative response although a positive response was required 
-    FS_EraseMemoryFailed                          = 2047, // Erase memory failed (e.g. ECU responded negatively to Erase-Routine request) 
-    FS_SoftwareAuthenticityCheckFailed            = 2048, // Software authenticity check failed (e.g. invalid signature) 
-    FS_SoftwareCompatibilityCheckFailed           = 2049, // Software compatibility check failed (e.g. invalid application data selected for already programmed application) 
-    FS_FingerprintCheckFailed                     = 2050, // Fingerprint check failed (e.g. invalid TesterSerialNumber configured) 
-    FS_HardwareCompatibilityCheckFailed           = 2051, // Hardware compatibility check failed (e.g. invalid software selected for hardware platform) 
-    FS_ProgrammingPreconditionsCheckFailed        = 2052, // Preconditions are not fulfilled (e.g. since the user tried to reprogram an engine ECU while the engine is running) 
-    FS_InvalidParameterDetected                   = 2053, // The value of a FlashAttribute is missing or invalid   
-
-    FS_GeneralCustomActionFailure                 = 2060, // Custom Action could not be executed   
-    FS_CustomActionAttributeConversionFailed      = 2061, // Custom Action Attribute could not be converted (e.g. string can not be converted into an integer)   
-
-    FS_ReportingFailure                           = 2080 // Reporting cannot be execute (e.g. could not create defined report file)   
-  
-  }; // enum vFlashStatusCode
-  
-  enum ReprogrammingProcess {Exec_Continue, Exec_End};
-  
-  enum vFlashStatusCode gReprogrammingStatus;
-  enum vFlashStatusCode gReprogrammingResult;
-  
-  const int gkMaxErrorTextLength = 2048;
-  char gErrorContext[gkMaxErrorTextLength];
-  
-  char gReprogrammingDone[19] = "reprogramming done";
-  char gFlashpack[500];
-  const cMaxPathNameLen=400;
-  char _gFlashpack[cMaxPathNameLen];
+    // --- FlashStatus Errors ---
+    FS_LicenseIsNotAvailable                      = 2009,     
+    FS_Aborted                                    = 2010,  
+    FS_UnknownError                               = 2011,  
+    FS_ProcessingFlashwareFailed                  = 2015,  
+    FS_InitializingCommunicationFailed            = 2016, 
+    FS_StopReprogrammingFailed                    = 2017,  
+    FS_ProjectDataInvalid                         = 2018,  
+    FS_InitializingFlashLibraryFailed             = 2019, 
+    FS_ScriptVersionMismatch                      = 2020, 
+    FS_LoadingProjectFailed                       = 2021, 
+    FS_FlashwareChanged                           = 2022, 
+    FS_ReadingExpectedIdentsFailed                = 2023, 
+    FS_ForceBootModeFailed                        = 2024,  
+    FS_SwitchBaudrateFailed                       = 2025, 
+    FS_SendWakeUpPatternFailed                    = 2026, 
+    FS_GeneralScriptFailure                       = 2040,  
+    FS_SeedKeyHandlingFailed                      = 2041,  
+    FS_SecurityAccessFailed                       = 2042, 
+    FS_CommunicationFailed                        = 2043,   
+    FS_DiagnosticTransactionFailed                = 2044, 
+    FS_SoftwareIntegrityCheckFailed               = 2045, 
+    FS_NegativeResponseReceived                   = 2046,  
+    FS_EraseMemoryFailed                          = 2047,  
+    FS_SoftwareAuthenticityCheckFailed            = 2048, 
+    FS_SoftwareCompatibilityCheckFailed           = 2049,  
+    FS_FingerprintCheckFailed                     = 2050, 
+    FS_HardwareCompatibilityCheckFailed           = 2051, 
+    FS_ProgrammingPreconditionsCheckFailed        = 2052, 
+    FS_InvalidParameterDetected                   = 2053,   
+    FS_GeneralCustomActionFailure                 = 2060,  
+    FS_CustomActionAttributeConversionFailed      = 2061,   
+    FS_ReportingFailure                           = 2080   
+  };
 }
 
-on timer tDelayedTextEvent
+// --- Helper Function ---
+void LogvFlashError(char contextName[])
 {
-#if TEST_NODE
-  TestSupplyTextEvent(gReprogrammingDone);
-#endif // TEST_NODE
-}
-
-// Performs all necessary steps to reprogram the passed vFlashPack
-// This function will return immediately (can be used in a simulation node)
-void vFlashStartPackReprogramming(char flashpack[])
-{
-  char errorText[gkMaxErrorTextLength];
-  
-  if (!ProcessPathName(flashpack)) 
-  {
-    snprintf(errorText, gkMaxErrorTextLength, "FATAL ERROR: No path to flashpack given!");
-    write(errorText);       
-#if TEST_NODE
-    TestStepFail("vFlashErrorMessage", errorText);
-    setTimer(tDelayedTextEvent, 1); // Send text event a bit delayed so that it is recognized in the test module as we directly return here
-#endif // TEST_NODE
-    return;
-  }
-  vFlashInitialize(); // callback: vFlashInitializeCompleted(enum vFlashStatusCode statusCode)
-}
-
-void vFlashInitializeCompleted(enum vFlashStatusCode statusCode)
-{
-  if (statusCode == Success)
-  {
-    vFlashLoadProject(_gFlashpack); // callback: vFlashLoadProjectCompleted(enum vFlashStatusCode statusCode)
-  }
-  else
-  {
-    gReprogrammingStatus = gReprogrammingResult = statusCode;
-    ProcessStatusCode("vFlashInitialize", Exec_End);
-  }
-}
-
-void vFlashLoadProjectCompleted(enum vFlashStatusCode statusCode)
-{
-  if (statusCode == Success)
-  {
-    vFlashActivateNetwork();  // callback: vFlashActivateNetworkCompleted(enum vFlashStatusCode statusCode)
-  }
-  else
-  {
-    gReprogrammingStatus = gReprogrammingResult = statusCode;
-    ProcessStatusCode("vFlashLoadProject", Exec_Continue);
-    vFlashDeinitialize();
-  }
-}
-
-void vFlashActivateNetworkCompleted(enum vFlashStatusCode statusCode)
-{
-  if (statusCode == Success)
-  {
-    vFlashReprogram(); // callback: vFlashReprogramCompleted(enum vFlashStatusCode statusCode)
-  }
-  else
-  {
-    gReprogrammingStatus = gReprogrammingResult = statusCode;
-    ProcessStatusCode("vFlashActivateNetwork", Exec_Continue);
-    vFlashUnloadProject();
-  }
-}
-
-void vFlashReprogramCompleted(enum vFlashStatusCode statusCode)
-{
-  gReprogrammingStatus = gReprogrammingResult = statusCode;
-  
-  if (statusCode == Success)
-  {    
-    vFlashUnloadProject();  // callback: vFlashUnloadProjectCompleted(enum vFlashStatusCode statusCode)
-  }
-  else
-  {
-    ProcessStatusCode("vFlashReprogram", Exec_Continue);
-    vFlashUnloadProject();
-  }
-}
-
-void vFlashUnloadProjectCompleted(enum vFlashStatusCode statusCode)
-{
-  if (statusCode == Success)
-  {
-    vFlashDeinitialize(); // callback: vFlashDeinitializeCompleted(enum vFlashStatusCode statusCode)
-  }
-  else
-  {
-    gReprogrammingStatus = statusCode;
-    ProcessStatusCode("vFlashUnloadProject", Exec_Continue);
-    vFlashDeinitialize();
-  }
-}
-
-void vFlashDeinitializeCompleted(enum vFlashStatusCode statusCode)
-{
-  gReprogrammingStatus = statusCode;
-  ProcessStatusCode("vFlashUnloadProject", Exec_End);
-}
-
-void vFlashStopReprogramming()
-{
-  vFlashStop(); // callback: vFlashStopCompleted(enum vFlashStatusCode statusCode)
-}
-
-void vFlashStopCompleted(enum vFlashStatusCode statusCode)
-{
-  vFlashUnloadProject();
-}
-
-// Will be called when the vFlashGetLastErrorMessage() has been called
-void vFlashErrorMessage(char msg[])
-{  
-  char errorText[gkMaxErrorTextLength];
-  snprintf(errorText, gkMaxErrorTextLength, "Error occurred during '%s': %s", gErrorContext, msg);
-#if TEST_NODE
-  TestStepFail("vFlashErrorMessage", errorText);
-#endif // TEST_NODE
-  if (msg[0])
-  {
-    write(errorText);
-  }
-  else {
-    if (gReprogrammingStatus==FR_UnknownError) 
-    {
-      write("Unknown error - Is the vFlash environment correctly installed on the Vector Tool Platform (VN89xx/VN88xx)?");
-    }
-  }
-}
-
-void ProcessStatusCode(char contextName[], enum ReprogrammingProcess info)
-{
-  if(gReprogrammingStatus != Success)    
-  {
-    strncpy(gErrorContext, contextName, elcount(contextName));
-    vFlashGetLastErrorMessage(); // callback: vFlashErrorMessage(char msg[])
-  }
-#if TEST_NODE
-  if (info == Exec_End) TestSupplyTextEvent(gReprogrammingDone);
-#endif // TEST_NODE
-}
-
-// In older versions, the global variable gFlashpack contained the path to the flashpack,
-// now the path is given as parameter ==> check for compatibility reasons
-word ProcessPathName(char flashpack[])
-{
-  // The global variable gFlashpack is used, so issue a warning if a different path is given to this function
-  if ( gFlashpack[0]) 
-  {
-    strncpy(_gFlashpack, gFlashpack, elcount(_gFlashpack));
-    if (0 != strncmp(flashpack, gFlashpack, elcount(flashpack))) 
-    {
-      write( "WARNING: the content of the global variable gFlashpack is used, not the argument given!");
-    }
-  }
-  else 
-  { // use argument if it is not empty
-    if (flashpack[0]) 
-    {
-      strncpy(_gFlashpack, flashpack, elcount(_gFlashpack));
-    }
-    else 
-    {
-      return(0); // Error (no path to flashpack given)
-    }
-  }
-  return(1); // Success
+  char errorText[2048];
+  TestWaitForvFlashLastErrorMessage(errorText, elcount(errorText));
+  TestStepFail(contextName, "Error occurred: %s", errorText);
 }
   
-/* Performs all necessary steps to reprogram the passed vFlashPack
- This function will wait until reprogramming has completed
+/*
+ This function could be to program vflashpack successfully.
 */
 enum vFlashStatusCode TestWaitForvFlashPackReprogrammed(char flashpack[])
 {
-#if TEST_NODE
-  enum vFlashStatusCode lastStatusCode;
-  enum vFlashStatusCode resultCode;
-  char errorText[gkMaxErrorTextLength];
-  int hasProjectLoaded = 1;
+  enum vFlashStatusCode status;
 
-  if (!ProcessPathName(flashpack)) { 
-    TestStepFail("TestWaitForvFlashInitialized", errorText);
-    return FR_FileNotFound; 
+  if(flashpack[0] == 0) 
+  { 
+    TestStepFail("vFlash Init", "No path to flashpack given!");
+    return FR_FileNotFound;
   }
   
-  //----- Initialize vFlash Library -----
-  teststep("Step Sequence", "Initialize Vflash Library");
-  lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashInitialized();
-  if (lastStatusCode != Success)
-  {
-    TestWaitForvFlashLastErrorMessage(errorText, 1024);
-    TestStepFail("TestWaitForvFlashInitialized", errorText);
-    return resultCode;
-  }
-  else
-  {
-    TestStep("TestWaitForvFlashInitialized", "vFlash initialized successfully");
+  TestStep("vFlash Sequence", "Initialize vFlash Library");
+  if ((status = (enum vFlashStatusCode)TestWaitForvFlashInitialized()) != Success) 
+  { 
+    LogvFlashError("Init"); 
+    return status; 
   }
   
-  //----- Load Project ----
-  testStep("Step Sequence", "Load vFlashpack");
-  lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashProjectLoaded(_gFlashpack);
-  if (lastStatusCode != Success)
-  {
-    hasProjectLoaded = 0;
-    TestWaitForvFlashLastErrorMessage(errorText, 1024);
-    TestStepFail("TestWaitForvFlashProjectLoaded", errorText);
-  }
-  else
-  {
-    TestStep("TestWaitForvFlashProjectLoaded", "Successfully loaded project: %s", _gFlashpack);
+  TestStep("vFlash Sequence", "Load vFlashpack: %s", flashpack);
+  if ((status = (enum vFlashStatusCode)TestWaitForvFlashProjectLoaded(flashpack)) != Success) 
+  { 
+    LogvFlashError("Load"); 
+    return status; 
   }
   
-  //----- Activate Network
-  if (lastStatusCode == Success)
-  {
-    testStep("Step Sequence", "Activate Network Node");
-    lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashNetworkActivated();
-    if (lastStatusCode != Success)
-    {
-      TestWaitForvFlashLastErrorMessage(errorText, 1024);
-      TestStepFail("TestWaitForvFlashNetworkActivated", errorText);
-    }
-    else
-    {
-      TestStep("TestWaitForvFlashNetworkActivated", "Network activated successfully");
-    }
+  TestStep("vFlash Sequence", "Activate Network");
+  if ((status = (enum vFlashStatusCode)TestWaitForvFlashNetworkActivated()) != Success) 
+  { 
+    LogvFlashError("Network"); 
+    TestWaitForvFlashProjectUnloaded(); // Clean up project
+    TestWaitForvFlashDeinitialized();   // Clean up initialization
+    return status;
   }
   
-  //----- Start Reprogramming ----
-  if (lastStatusCode == Success)
+  TestStep("vFlash Sequence", "Start Flashing");
+  status = (enum vFlashStatusCode)TestWaitForvFlashReprogrammed();
+  if (status != Success) 
   {
-    testStep("Step Sequence", "Flashing Started");
-    lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashReprogrammed();
-    if (lastStatusCode != Success)
-    {
-      TestWaitForvFlashLastErrorMessage(errorText, 1024);
-      TestStepFail("TestWaitForvFlashReprogrammed", errorText);
-    }
-    else
-    {
-      TestStep("TestWaitForvFlashReprogrammed", "ECU reprogrammed successful");
-    }
+    LogvFlashError("Flashing");
   }
-
-  //----- Unload Project ----
-  if (hasProjectLoaded)
+  else 
   {
-    testStep("Step Sequence", "Unload VflashPack");
-    lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashProjectUnloaded();
-    if (lastStatusCode != Success)
-    {    
-      TestWaitForvFlashLastErrorMessage(errorText, 1024);
-      TestStepFail("TestWaitForvFlashProjectUnloaded", errorText);
-    }
-    else
-    {
-      TestStep("TestWaitForvFlashProjectUnloaded", "Project unloaded successfully");
-    }   
+    TestStepPass("vFlash Sequence", "ECU reprogrammed successfully");
   }
   
-  //----- Deinitialize vFlash Library ----
-  testStep("Step Sequence", "Deinitialize vFlash Library");
-  lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashDeinitialized();
-  if (lastStatusCode != Success)
-  {
-    TestWaitForvFlashLastErrorMessage(errorText, 1024);
-    TestStepFail("TestWaitForvFlashDeinitialized", errorText);
-  }
-  else
-  {
-    TestStep("TestWaitForvFlashDeinitialized", "vFlash deinitialized successfully");
-  }
-  return resultCode; // last result is of TestWaitForvFlashReprogrammed; result of Unload/Deinitialize ignored
-#else
-  write( "ERROR: the function TestWaitForvFlashPackReprogrammed is only available in a test module!");
-  return TestFunctionInSimulationCalled;
-#endif
+  // Final Teardown - Executes if Flashing succeeds or fails
+  TestStep("vFlash Sequence", "Unload and Deinitialize");
+  TestWaitForvFlashProjectUnloaded();
+  TestWaitForvFlashDeinitialized();
+  
+  return status;
 }
 
-/* Performs all necessary steps to reprogram the passed vFlashPack
- This function will wait until reprogramming has completed. This function return success if flashing is failed else failure
+/*
+ This function could be used when testing corrupted vflashpack - Application/Checksum/Signature corrupted files
 */
 enum vFlashStatusCode TestWaitForCorruptedvFlashPackReprogrammed(char flashpack[], char expected_error_text[])
 {
-#if TEST_NODE
   enum vFlashStatusCode lastStatusCode;
-  enum vFlashStatusCode resultCode;
-  char errorText[gkMaxErrorTextLength];
-  int hasProjectLoaded = 1;
-
-  if (!ProcessPathName(flashpack)) { 
-    TestStepFail("TestWaitForvFlashInitialized", errorText);
-    return FR_FileNotFound; 
+  char errorText[2048];
+  int hasProjectLoaded = 0;
+  int expectedErrorFound = 0;
+  
+  if(flashpack[0] == 0) 
+  { 
+    TestStepFail("vFlash Init", "No path to flashpack given!");
+    return FR_FileNotFound;
   }
   
-  //----- Initialize vFlash Library -----
-  teststep("Step Sequence", "Initialize Vflash Library");
-  lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashInitialized();
-  if (lastStatusCode != Success)
+  TestStep("vFlash Sequence", "Initialize vFlash Library");
+  lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashInitialized();
+  if (lastStatusCode != Success) 
   {
-    TestWaitForvFlashLastErrorMessage(errorText, 1024);
-    TestStepFail("TestWaitForvFlashInitialized", errorText);
-    return resultCode;
-  }
-  else
+	  TestWaitForvFlashLastErrorMessage(errorText, elcount(errorText));
+  } 
+  else 
   {
-    TestStep("TestWaitForvFlashInitialized", "vFlash initialized successfully");
-  }
-  
-  //----- Load Project ----
-  testStep("Step Sequence", "Load vFlashpack");
-  lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashProjectLoaded(_gFlashpack);
-  if (lastStatusCode != Success)
-  {
-    hasProjectLoaded = 0;
-    TestWaitForvFlashLastErrorMessage(errorText, 1024);
-    TestStepFail("TestWaitForvFlashProjectLoaded", errorText);
-  }
-  else
-  {
-    TestStep("TestWaitForvFlashProjectLoaded", "Successfully loaded project: %s", _gFlashpack);
-  }
-  
-  //----- Activate Network
-  if (lastStatusCode == Success)
-  {
-    testStep("Step Sequence", "Activate Network Node");
-    lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashNetworkActivated();
-    if (lastStatusCode != Success)
+    TestStep("vFlash Sequence", "Load vFlashpack: %s", flashpack);
+    lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashProjectLoaded(flashpack);
+    if (lastStatusCode != Success) 
     {
-      TestWaitForvFlashLastErrorMessage(errorText, 1024);
-      TestStepFail("TestWaitForvFlashNetworkActivated", errorText);
-    }
-    else
+      TestWaitForvFlashLastErrorMessage(errorText, elcount(errorText));
+    } 
+    else 
     {
-      TestStep("TestWaitForvFlashNetworkActivated", "Network activated successfully");
-    }
-  }
-  
-  //----- Start Reprogramming ----
-  if (lastStatusCode == Success)
-  {
-    testStep("Step Sequence", "vFlash Flashing sequence started");
-    lastStatusCode = resultCode = (enum vFlashStatusCode) TestWaitForvFlashReprogrammed();
-    if (lastStatusCode != Success)
-    {
-      TestWaitForvFlashLastErrorMessage(errorText, 1024);
-      if(strstr(errorText, expected_error_text) != -1)
+      hasProjectLoaded = 1;
+      TestStep("vFlash Sequence", "Activate Network");
+      lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashNetworkActivated();
+      if (lastStatusCode != Success) 
       {
-        testStepPass("TestWaitForvFlashReprogrammed", "Expected Error occurred during Flashing: %s", errorText);
-      }
-      else
+        TestWaitForvFlashLastErrorMessage(errorText, elcount(errorText));
+      } 
+      else 
       {
-       TestStepFail("TestWaitForvFlashReprogrammed", "Unexpected Error occurred during Flashing: %s", errorText); 
+        TestStep("vFlash Sequence", "Start Flashing (Expecting Failure)");
+        lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashReprogrammed();
+        if (lastStatusCode == Success) 
+        {
+          TestStepFail("Error Check", "ECU reprogrammed successfully, but failure was expected.");
+        } 
+        else 
+        {
+          TestWaitForvFlashLastErrorMessage(errorText, elcount(errorText));
+        }
       }
     }
-    else
+  }
+  // Validate if the error we caught matches the error we wanted
+  if (lastStatusCode != Success) 
+  {
+    if (strstr(errorText, expected_error_text) != -1) 
     {
-      testStepFail("TestWaitForvFlashReprogrammed", "ECU reprogrammed successful");
+      TestStepPass("Error Check", "Caught expected error: %s", errorText);
+      expectedErrorFound = 1;
+    } 
+    else 
+    {
+      TestStepFail("Error Check", "Unexpected Error occurred: %s (Expected: %s)", errorText, expected_error_text);
     }
   }
 
-  //----- Unload Project ----
-  if (hasProjectLoaded)
+  TestStep("vFlash Sequence", "Unload and Deinitialize");
+  if(hasProjectLoaded) 
   {
-    testStep("Step Sequence", "Unload VflashPack");
-    lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashProjectUnloaded();
-    if (lastStatusCode != Success)
-    {    
-      TestWaitForvFlashLastErrorMessage(errorText, 1024);
-      TestStepFail("TestWaitForvFlashProjectUnloaded", errorText);
-    }
-    else
-    {
-      TestStep("TestWaitForvFlashProjectUnloaded", "Project unloaded successfully");
-    }   
+    TestWaitForvFlashProjectUnloaded();
   }
-  
-  //----- Deinitialize vFlash Library ----
-  testStep("Step Sequence", "Deinitialize vFlash Library");
-  lastStatusCode = (enum vFlashStatusCode) TestWaitForvFlashDeinitialized();
-  if (lastStatusCode != Success)
-  {
-    TestWaitForvFlashLastErrorMessage(errorText, 1024);
-    TestStepFail("TestWaitForvFlashDeinitialized", errorText);
-  }
-  else
-  {
-    TestStep("TestWaitForvFlashDeinitialized", "vFlash deinitialized successfully");
-  }
-  return resultCode; // last result is of TestWaitForvFlashReprogrammed; result of Unload/Deinitialize ignored
-#else
-  write( "ERROR: the function TestWaitForvFlashPackReprogrammed is only available in a test module!");
-  return TestFunctionInSimulationCalled;
-#endif
+  TestWaitForvFlashDeinitialized();
+
+  // Return Success if the expected error was found, meaning the negative test "passed"
+  return expectedErrorFound ? Success : lastStatusCode;
 }
